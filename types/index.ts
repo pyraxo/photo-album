@@ -17,6 +17,10 @@ export interface Album {
   name: string;
   photoIds: string[];
   coverPhotoId?: string;
+  color?: {
+    base: string;
+    binding: string;
+  };
 }
 
 export interface PhotoStore {

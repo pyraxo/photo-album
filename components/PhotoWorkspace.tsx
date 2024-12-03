@@ -6,75 +6,138 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { usePhotoStore } from '@/lib/store';
 import { PhotoCanvas } from './PhotoCanvas';
 import { AlbumShelf } from './AlbumShelf';
-import { Button } from './ui/button';
-import { Plus } from 'lucide-react';
-import { CreateAlbumDialog } from './CreateAlbumDialog';
-import { WorkspaceSettings, BackgroundStyle } from './WorkspaceSettings';
 import { cn } from '@/lib/utils';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+  ContextMenuSeparator,
+  ContextMenuLabel,
+} from '@/components/ui/context-menu';
+import { Grid, Circle, Square } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+
+export type BackgroundStyle = 'plain' | 'grid' | 'dots';
 
 export default function PhotoWorkspace() {
-  const [isCreatingAlbum, setIsCreatingAlbum] = useState(false);
   const [background, setBackground] = useState<BackgroundStyle>('plain');
+  const [isDragging, setIsDragging] = useState(false);
   const currentAlbumId = usePhotoStore((state) => state.currentAlbumId);
+  const { toast } = useToast();
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (e.dataTransfer.types.includes('Files')) {
+      setIsDragging(true);
+    }
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setIsDragging(false);
+    }
+  };
 
   const handleFileDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
+    setIsDragging(false);
     const files = Array.from(e.dataTransfer.files);
+    const imageFiles = files.filter(file => file.type.startsWith('image/'));
     const dropX = e.clientX;
     const dropY = e.clientY;
 
-    files.forEach((file) => {
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const url = e.target?.result as string;
-          usePhotoStore.getState().addPhoto({
-            id: Math.random().toString(36).substr(2, 9),
-            url,
-            caption: '',
-            position: { x: dropX, y: dropY },
-            rotation: (Math.random() - 0.5) * 0.2,
-            scale: 1,
-          });
-        };
-        reader.readAsDataURL(file);
-      }
+    if (imageFiles.length === 0) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please drop image files only.",
+      });
+      return;
+    }
+
+    imageFiles.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const url = e.target?.result as string;
+        usePhotoStore.getState().addPhoto({
+          id: Math.random().toString(36).substr(2, 9),
+          url,
+          caption: '',
+          position: { x: dropX, y: dropY },
+          rotation: (Math.random() - 0.5) * 0.2,
+          scale: 1,
+        });
+
+        toast({
+          title: "Image Added",
+          description: `Successfully added ${file.name}`,
+        });
+      };
+      reader.readAsDataURL(file);
     });
-  }, []);
+  }, [toast]);
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div
-        className={cn(
-          'w-full h-screen relative',
-          background === 'grid' && 'bg-grid',
-          background === 'dots' && 'bg-dots'
-        )}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={handleFileDrop}
-      >
-        <div className="absolute top-4 right-4 z-10 flex gap-2">
-          <WorkspaceSettings onBackgroundChange={setBackground} />
-          <Button onClick={() => setIsCreatingAlbum(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Create Album
-          </Button>
-        </div>
+      <ContextMenu>
+        <ContextMenuTrigger>
+          <div
+            className={cn(
+              'w-full h-screen relative',
+              background === 'grid' && 'bg-grid',
+              background === 'dots' && 'bg-dots',
+              isDragging && [
+                'outline-none ring-2 ring-primary/50',
+                'after:absolute after:inset-4',
+                'after:border-2 after:border-dashed after:border-primary/50',
+                'after:rounded-lg after:transition-all',
+                'after:animate-pulse',
+              ]
+            )}
+            onDragOver={(e) => e.preventDefault()}
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDrop={handleFileDrop}
+          >
+            {currentAlbumId ? (
+              <PhotoCanvas />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                Select an album to view or create a new one
+              </div>
+            )}
 
-        {currentAlbumId ? (
-          <PhotoCanvas />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-            Select an album to view or create a new one
+            <AlbumShelf />
           </div>
-        )}
-
-        <AlbumShelf />
-        <CreateAlbumDialog
-          open={isCreatingAlbum}
-          onOpenChange={setIsCreatingAlbum}
-        />
-      </div>
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuLabel>Background Style</ContextMenuLabel>
+          <ContextMenuSeparator />
+          <ContextMenuItem
+            onClick={() => setBackground('plain')}
+            className={cn(background === 'plain' && 'bg-accent')}
+          >
+            <Square className="w-4 h-4 mr-2" />
+            Plain
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={() => setBackground('grid')}
+            className={cn(background === 'grid' && 'bg-accent')}
+          >
+            <Grid className="w-4 h-4 mr-2" />
+            Grid
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={() => setBackground('dots')}
+            className={cn(background === 'dots' && 'bg-accent')}
+          >
+            <Circle className="w-4 h-4 mr-2" />
+            Dots
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
     </DndProvider>
   );
 }

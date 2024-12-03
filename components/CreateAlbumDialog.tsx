@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { usePhotoStore } from '@/lib/store';
+import { useToast } from '@/hooks/use-toast';
 
 interface CreateAlbumDialogProps {
   open: boolean;
@@ -14,14 +15,23 @@ interface CreateAlbumDialogProps {
 export function CreateAlbumDialog({ open, onOpenChange }: CreateAlbumDialogProps) {
   const [name, setName] = useState('');
   const addAlbum = usePhotoStore((state) => state.addAlbum);
+  const { toast } = useToast();
 
   const handleCreate = () => {
     if (!name.trim()) return;
+
+    const albumId = Math.random().toString(36).substr(2, 9);
     addAlbum({
-      id: Math.random().toString(36).substr(2, 9),
+      id: albumId,
       name: name.trim(),
       photoIds: [],
     });
+
+    toast({
+      title: "Album Created",
+      description: `Successfully created album "${name.trim()}"`,
+    });
+
     setName('');
     onOpenChange(false);
   };
