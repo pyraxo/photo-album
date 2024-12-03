@@ -8,6 +8,8 @@ export interface Photo {
   };
   rotation: number;
   scale: number;
+  width: number;
+  height: number;
   zIndex?: number;
   albumId?: string | null;
 }

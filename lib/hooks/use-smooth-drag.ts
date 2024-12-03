@@ -3,8 +3,14 @@
 import { useState, useCallback } from 'react';
 import { useSpring } from '@react-spring/web';
 
+interface Position {
+  x: number;
+  y: number;
+}
+
 export function useSmoothDrag(initialX = 0, initialY = 0, onPositionChange?: (x: number, y: number) => void) {
   const [isDragging, setIsDragging] = useState(false);
+  const [currentPosition, setCurrentPosition] = useState<Position>({ x: initialX, y: initialY });
 
   const [{ x, y, scale, rotate }, api] = useSpring(() => ({
     x: initialX,
@@ -26,6 +32,7 @@ export function useSmoothDrag(initialX = 0, initialY = 0, onPositionChange?: (x:
     const moveHandler = (moveEvent: MouseEvent) => {
       const newX = moveEvent.clientX - offsetX;
       const newY = moveEvent.clientY - offsetY;
+      setCurrentPosition({ x: newX, y: newY });
       api.start({
         x: newX,
         y: newY,
@@ -62,5 +69,6 @@ export function useSmoothDrag(initialX = 0, initialY = 0, onPositionChange?: (x:
       scale,
       rotate,
     },
+    currentPosition: isDragging ? currentPosition : null,
   };
 }

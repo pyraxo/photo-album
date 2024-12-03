@@ -28,6 +28,7 @@ export default function PhotoWorkspace() {
 
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
+    if (!currentAlbumId) return;
     if (e.dataTransfer.types.includes('Files')) {
       setIsDragging(true);
     }
@@ -43,6 +44,16 @@ export default function PhotoWorkspace() {
   const handleFileDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
+
+    if (!currentAlbumId) {
+      toast({
+        variant: "destructive",
+        title: "No Album Selected",
+        description: "Please select or create an album first.",
+      });
+      return;
+    }
+
     const files = Array.from(e.dataTransfer.files);
     const imageFiles = files.filter(file => file.type.startsWith('image/'));
     const dropX = e.clientX;
@@ -61,23 +72,29 @@ export default function PhotoWorkspace() {
       const reader = new FileReader();
       reader.onload = (e) => {
         const url = e.target?.result as string;
-        usePhotoStore.getState().addPhoto({
-          id: Math.random().toString(36).substr(2, 9),
-          url,
-          caption: '',
-          position: { x: dropX, y: dropY },
-          rotation: (Math.random() - 0.5) * 0.2,
-          scale: 1,
-        });
+        const img = new Image();
+        img.src = url;
+        img.onload = () => {
+          usePhotoStore.getState().addPhoto({
+            id: Math.random().toString(36).substring(2, 11),
+            url,
+            caption: '',
+            position: { x: dropX, y: dropY },
+            rotation: (Math.random() - 0.5) * 0.2,
+            scale: 1,
+            width: img.width,
+            height: img.height,
+          });
 
-        toast({
-          title: "Image Added",
-          description: `Successfully added ${file.name}`,
-        });
+          toast({
+            title: "Image Added",
+            description: `Successfully added ${file.name}`,
+          });
+        };
       };
       reader.readAsDataURL(file);
     });
-  }, [toast]);
+  }, [currentAlbumId, toast]);
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -88,7 +105,7 @@ export default function PhotoWorkspace() {
               'w-full h-screen relative',
               background === 'grid' && 'bg-grid',
               background === 'dots' && 'bg-dots',
-              isDragging && [
+              isDragging && currentAlbumId && [
                 'outline-none ring-2 ring-primary/50',
                 'after:absolute after:inset-4',
                 'after:border-2 after:border-dashed after:border-primary/50',
@@ -101,14 +118,7 @@ export default function PhotoWorkspace() {
             onDragLeave={handleDragLeave}
             onDrop={handleFileDrop}
           >
-            {currentAlbumId ? (
-              <PhotoCanvas />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                Select an album to view or create a new one
-              </div>
-            )}
-
+            <PhotoCanvas />
             <AlbumShelf />
           </div>
         </ContextMenuTrigger>
