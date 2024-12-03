@@ -1,22 +1,22 @@
 'use client';
 
-import { useCallback, useState } from 'react';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import { usePhotoStore } from '@/lib/store';
-import { PhotoCanvas } from './PhotoCanvas';
-import { AlbumShelf } from './AlbumShelf';
-import { cn } from '@/lib/utils';
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
-  ContextMenuTrigger,
-  ContextMenuSeparator,
   ContextMenuLabel,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
 } from '@/components/ui/context-menu';
-import { Grid, Circle, Square } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { usePhotoStore } from '@/lib/stores/use-photo-store';
+import { cn } from '@/lib/utils';
+import { Circle, Grid, Square } from 'lucide-react';
+import { useCallback, useState } from 'react';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { AlbumShelf } from './AlbumShelf';
+import { PhotoCanvas } from './canvas/PhotoCanvas';
 
 export type BackgroundStyle = 'plain' | 'grid' | 'dots';
 

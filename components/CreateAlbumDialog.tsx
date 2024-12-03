@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { usePhotoStore } from '@/lib/store';
+import { usePhotoStore } from '@/lib/stores/use-photo-store';
 import { useToast } from '@/hooks/use-toast';
 
 interface CreateAlbumDialogProps {

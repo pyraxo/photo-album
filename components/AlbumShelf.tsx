@@ -1,6 +1,6 @@
 'use client';
 
-import { usePhotoStore } from '@/lib/store';
+import { usePhotoStore } from '@/lib/stores/use-photo-store';
 import { cn } from '@/lib/utils';
 import { useMemo, useState } from 'react';
 import {

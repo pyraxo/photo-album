@@ -1,12 +1,12 @@
 'use client';
 
-import { usePhotoStore } from '@/lib/store';
-import { DraggablePhoto } from './DraggablePhoto';
-import { PinBox } from './PinBox';
+import { usePhotoStore } from '@/lib/stores/use-photo-store';
 import { useCanvasStore } from '@/lib/stores/use-canvas-store';
 import { cn } from '@/lib/utils';
-import { useEffect, useCallback } from 'react';
-import { Pin } from './canvas/Pin';
+import { useCallback, useEffect } from 'react';
+import { DraggablePhoto } from './DraggablePhoto';
+import { Pin } from './Pin';
+import { PinBox } from './PinBox';
 
 export function PhotoCanvas() {
   const currentAlbumId = usePhotoStore((state) => state.currentAlbumId);

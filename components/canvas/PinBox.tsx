@@ -1,8 +1,8 @@
 'use client';
 
-import { cn } from '@/lib/utils';
+import { usePhotoStore } from '@/lib/stores/use-photo-store';
 import { useCanvasStore } from '@/lib/stores/use-canvas-store';
-import { usePhotoStore } from '@/lib/store';
+import { cn } from '@/lib/utils';
 
 interface PinColor {
   gradient: string;

@@ -14,7 +14,7 @@ import { Pencil, Trash2, Type } from "lucide-react";
 import { useState } from "react";
 import { AddCaptionDialog } from "./AddCaptionDialog";
 import { DeleteDialog } from "./ui/delete-dialog";
-import { usePhotoStore } from "@/lib/store";
+import { usePhotoStore } from "@/lib/stores/use-photo-store";
 
 interface ImageContextMenuProps {
   children: React.ReactNode;

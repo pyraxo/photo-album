@@ -4,7 +4,7 @@ import { useSmoothDrag } from '@/lib/hooks/use-smooth-drag';
 import { cn } from '@/lib/utils';
 import { animated } from '@react-spring/web';
 import { useState } from 'react';
-import { HoverTooltip } from '../HoverTooltip';
+import { HoverTooltip } from '../overlays/HoverTooltip';
 
 interface PinProps {
   x: number;

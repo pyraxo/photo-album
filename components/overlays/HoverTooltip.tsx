@@ -1,7 +1,5 @@
 'use client';
 
-import { getRotatedRectBounds } from '@/lib/utils/geometry';
-
 interface HoverTooltipProps {
   x: number;
   y: number;
@@ -28,15 +26,6 @@ export function HoverTooltip({ x, y, width, height, rotation, mouseX, mouseY, ty
         {type === 'image' && width && height && (
           <>
             <div>Size: {Math.round(width)}×{Math.round(height)}</div>
-            <div>Rotation: {Math.round(rotation || 0)}°</div>
-            {rotation !== 0 && (() => {
-              const bounds = getRotatedRectBounds({ x, y, width, height, rotation });
-              return (
-                <div className="text-gray-400">
-                  Bounds: {Math.round(bounds.width)}×{Math.round(bounds.height)}
-                </div>
-              );
-            })()}
           </>
         )}
         {type === 'pin' && color && (

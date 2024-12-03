@@ -1,17 +1,17 @@
 'use client';
 
-import { animated } from '@react-spring/web';
-import { usePhotoStore } from '@/lib/store';
-import { Photo } from '@/types';
-import { cn } from '@/lib/utils';
-import { useSmoothDrag } from '@/lib/hooks/use-smooth-drag';
-import Image from 'next/image';
-import { ImageContextMenu } from './ImageContextMenu';
-import { useState, useCallback } from 'react';
-import { DeleteImageDialog } from './DeleteImageDialog';
 import { useToast } from '@/hooks/use-toast';
+import { useSmoothDrag } from '@/lib/hooks/use-smooth-drag';
 import { useCanvasStore } from '@/lib/stores/use-canvas-store';
-import { HoverTooltip } from './HoverTooltip';
+import { usePhotoStore } from '@/lib/stores/use-photo-store';
+import { cn } from '@/lib/utils';
+import { Photo } from '@/types';
+import { animated } from '@react-spring/web';
+import Image from 'next/image';
+import { useCallback, useState } from 'react';
+import { DeleteImageDialog } from '../DeleteImageDialog';
+import { ImageContextMenu } from '../ImageContextMenu';
+import { HoverTooltip } from '../overlays/HoverTooltip';
 
 interface DraggablePhotoProps {
   photo: Photo;
