@@ -9,9 +9,12 @@ import { AlbumShelf } from './AlbumShelf';
 import { Button } from './ui/button';
 import { Plus } from 'lucide-react';
 import { CreateAlbumDialog } from './CreateAlbumDialog';
+import { WorkspaceSettings, BackgroundStyle } from './WorkspaceSettings';
+import { cn } from '@/lib/utils';
 
 export default function PhotoWorkspace() {
   const [isCreatingAlbum, setIsCreatingAlbum] = useState(false);
+  const [background, setBackground] = useState<BackgroundStyle>('plain');
   const currentAlbumId = usePhotoStore((state) => state.currentAlbumId);
 
   const handleFileDrop = useCallback((e: React.DragEvent) => {
@@ -42,11 +45,16 @@ export default function PhotoWorkspace() {
   return (
     <DndProvider backend={HTML5Backend}>
       <div
-        className="w-full h-screen relative"
+        className={cn(
+          'w-full h-screen relative',
+          background === 'grid' && 'bg-grid',
+          background === 'dots' && 'bg-dots'
+        )}
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleFileDrop}
       >
-        <div className="absolute top-4 right-4 z-10">
+        <div className="absolute top-4 right-4 z-10 flex gap-2">
+          <WorkspaceSettings onBackgroundChange={setBackground} />
           <Button onClick={() => setIsCreatingAlbum(true)}>
             <Plus className="w-4 h-4 mr-2" />
             Create Album
