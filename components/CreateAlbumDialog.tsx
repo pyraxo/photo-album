@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
-import { Input } from './ui/input';
 import { Button } from './ui/button';
+import { Input } from './ui/input';
 import { usePhotoStore } from '@/lib/store';
 
 interface CreateAlbumDialogProps {
@@ -17,15 +17,20 @@ export function CreateAlbumDialog({ open, onOpenChange }: CreateAlbumDialogProps
 
   const handleCreate = () => {
     if (!name.trim()) return;
-
     addAlbum({
       id: Math.random().toString(36).substr(2, 9),
-      name,
+      name: name.trim(),
       photoIds: [],
     });
-
     setName('');
     onOpenChange(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleCreate();
+    }
   };
 
   return (
@@ -39,6 +44,7 @@ export function CreateAlbumDialog({ open, onOpenChange }: CreateAlbumDialogProps
             placeholder="Album name"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
           <Button onClick={handleCreate}>Create Album</Button>
         </div>

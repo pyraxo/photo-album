@@ -1,53 +1,49 @@
 'use client';
 
 import { usePhotoStore } from '@/lib/store';
-import { Album } from '@/types';
-import { useDrop } from 'react-dnd';
-import { ScrollArea } from './ui/scroll-area';
-import { Button } from './ui/button';
-import { Book } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export function AlbumShelf() {
-  const { albums, addPhotoToAlbum } = usePhotoStore();
+  const albums = usePhotoStore((state) => state.albums);
+  const currentAlbumId = usePhotoStore((state) => state.currentAlbumId);
+  const setCurrentAlbum = usePhotoStore((state) => state.setCurrentAlbum);
+  const photos = usePhotoStore((state) => state.photos);
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur-sm border-t">
-      <ScrollArea className="h-32">
-        <div className="flex gap-4 p-4">
-          {albums.map((album) => (
-            <AlbumDropZone key={album.id} album={album} onAddPhoto={addPhotoToAlbum} />
-          ))}
-        </div>
-      </ScrollArea>
-    </div>
-  );
-}
+    <div className="absolute bottom-0 left-0 right-0 h-24 bg-white/10 backdrop-blur-sm border-t">
+      <div className="flex gap-4 p-4 overflow-x-auto">
+        {albums.map((album) => {
+          const coverPhoto = album.coverPhotoId
+            ? photos.find(p => p.id === album.coverPhotoId)
+            : photos.find(p => p.albumId === album.id);
 
-interface AlbumDropZoneProps {
-  album: Album;
-  onAddPhoto: (photoId: string, albumId: string) => void;
-}
-
-function AlbumDropZone({ album, onAddPhoto }: AlbumDropZoneProps) {
-  const [{ isOver }, drop] = useDrop(() => ({
-    accept: 'photo',
-    drop: (item: { id: string }) => {
-      onAddPhoto(item.id, album.id);
-    },
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-    }),
-  }));
-
-  return (
-    <div
-      ref={drop}
-      className={`w-24 h-24 flex flex-col items-center justify-center rounded-lg border-2 transition-colors ${
-        isOver ? 'border-primary bg-primary/10' : 'border-border'
-      }`}
-    >
-      <Book className="w-8 h-8 mb-2" />
-      <span className="text-sm font-medium text-center">{album.name}</span>
+          return (
+            <button
+              key={album.id}
+              onClick={() => setCurrentAlbum(album.id)}
+              className={cn(
+                'relative w-24 h-16 rounded-lg overflow-hidden border-2 transition-all',
+                currentAlbumId === album.id
+                  ? 'border-white scale-110'
+                  : 'border-transparent hover:border-white/50'
+              )}
+            >
+              {coverPhoto && (
+                <img
+                  src={coverPhoto.url}
+                  alt={album.name}
+                  className="w-full h-full object-cover"
+                />
+              )}
+              <div className="absolute inset-0 bg-black/30 flex items-end p-1">
+                <p className="text-xs text-white font-medium truncate">
+                  {album.name}
+                </p>
+              </div>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

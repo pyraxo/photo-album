@@ -2,9 +2,14 @@ export interface Photo {
   id: string;
   url: string;
   caption: string;
-  position: { x: number; y: number };
+  position: {
+    x: number;
+    y: number;
+  };
   rotation: number;
   scale: number;
+  zIndex?: number;
+  albumId?: string | null;
 }
 
 export interface Album {
@@ -12,4 +17,10 @@ export interface Album {
   name: string;
   photoIds: string[];
   coverPhotoId?: string;
+}
+
+export interface PhotoStore {
+  currentAlbumId: string | null;
+  photos: Photo[];
+  albums: Album[];
 }
